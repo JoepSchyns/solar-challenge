@@ -39,8 +39,7 @@ export default {
       try{
         clearTimeout(this.timeout); // Prevent parallel data lookups
         const result = await fetch('time.csv'); // Request data from 'server'
-        const doc = await result.blob(); // Get raw data
-        const text = await doc.text(); // Convert raw data to text
+        const text = await result.text(); // Convert raw data to text
         this.data = await csvtojson().fromString(text); // Convert text to json
         this.timeout = setTimeout(this.getData, document.hidden ? 60000 : 5000); 
         // Repeat getData function after 1 second or 5 seconds if the browser tab is not visible
