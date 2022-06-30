@@ -14,12 +14,13 @@
             <button type="button" class="btn btn-outline-warning">Finale</button>
           </div>
     </th>
-    <td>{{ tabelle_y }}</td>
+    <td>{{ data }}</td>
   </tr>
 </table>
 </template>
 
 <script>
+import csvtojson from 'csvtojson'
 export default {
   data() {
     return {
@@ -38,15 +39,16 @@ export default {
       try{
         clearTimeout(this.timeout); // Prevent parallel data lookups
         const result = await fetch('time.csv'); // Request data from 'server'
-        const conversion = require('csvtojson');
-        this.data = conversion(result.data); // Parse data and make available to Vue with this.data
-        this.timeout = setTimeout(this.getData, document.hidden ? 5000 : 1000); 
+        const doc = await result.blob(); // Get raw data
+        const text = await doc.text(); // Convert raw data to text
+        this.data = await csvtojson().fromString(text); // Convert text to json
+        this.timeout = setTimeout(this.getData, document.hidden ? 60000 : 5000); 
         // Repeat getData function after 1 second or 5 seconds if the browser tab is not visible
       } catch(e){ // If something did not go as planned
         this.data = null; // Remove previous data
         console.error(e); // Print error in console
         this.error = e.toString(); // Make error available for displaying in Vue with this.error
-        this.timeout = setTimeout(this.getData, 5000); // Repeat getData function after 5 seconds
+        this.timeout = setTimeout(this.getData, 60000); // Repeat getData function after 5 seconds
       }
     }       
   },
